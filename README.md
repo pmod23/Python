@@ -8,7 +8,7 @@ The user has 4 options:
 Option 1 - Enter a new contact Option 2 - Display contacts Option 3 - Find
 contact using first name Option 4 - "q - quit program"
 
-Install - run: pipenv install peewee psycopg2-binary autopep8
+Install: pipenv install peewee psycopg2-binary autopep8
 
 run: pipenv shell
 

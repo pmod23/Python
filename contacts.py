@@ -1,29 +1,32 @@
+from peewee import *
 
 
+db = SqliteDatabase('people.db')
 
-class Person:
-    def __init__(self, first, last, phone_number):
-        self.first = first
-        self.last = last
-        self.phone_number = phone_number
+db.connect()
 
-#finding a name by full name
-    def full_name(self):
-        return f'{self.first} {self.last}'
 
-#returning a string of class Person
-    def __str__(self):
-        return f"{self.first} {self.last} : {self.phone_number}"
+class BaseModel(Model):
+    class Meta:
+        database = db
 
-#starting with empty list to store contacts
-contacts = list()
+
+class Person(BaseModel):
+    first_name = CharField()
+    last_name = CharField()
+    phone_number = CharField()
+
+    class Meta:
+        database = db
+
+
+db.create_tables([Person])
 
 users_input = ""
 
 
 print("Welcome to the address book program")
 
-#while loop to go on until user decides to "Quit" the program
 while users_input != "q":
     print("Available options")
     print("1 - Enter a contact")
@@ -31,29 +34,33 @@ while users_input != "q":
     print("3 - Find contact")
     print("q - quit program")
     users_input = input("Select option: ")
-#logic
+
     if users_input == "1":
         print("Enter your contact's information")
 
-        first_name = input("First name = ")
-        last_name = input("Last name = ")
-        phone_number = input("Phone number = ")
+        first = input("First name = ")
+        last = input("Last name = ")
+        phone = input("Phone number = ")
 
-        our_contact = Person(first_name, last_name, phone_number)
-        contacts.append(our_contact)
+        our_contact = Person(
+            first_name=first, last_name=last, phone_number=phone)
+        our_contact.save()
         print("Thank you we have received your contacts information")
-#loop through contacts list to see all contacts
     elif users_input == "2":
-        for contact in contacts:
-            print(contact)
+        for contact in Person.select():
+            print("{} {} : {}".format(contact.first_name,
+                                      contact.last_name, contact.phone_number))
         input("Contacts displayed. Hit enter to continue.")
     elif users_input == "3":
-        to_lookup = input("Enter contact's name to lookup\n")
-        for contact in contacts:
-            if to_lookup in contact.full_name():
-                print(contact)
+        to_lookup = input("Enter contact's name to lookup\n").lower()
+        found = False
+        for contact in Person.select():
+            if to_lookup.lower() in contact.first_name.lower():
+                print(contact.first_name, contact.last_name, contact.phone_number)
+                found = True
+
+        if found == False:
+            print("Contact not found.")
+
     elif users_input.lower() == "q":
         break
-
-
-print("Thank you for using the address book")
